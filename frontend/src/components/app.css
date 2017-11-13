@@ -1,0 +1,9 @@
+.logo{
+  height: 35px;
+  width: 200px;
+}
+
+header.mdc-theme--background.mdc-toolbar {
+  background-color: transparent;
+  padding: 0 50px;
+}

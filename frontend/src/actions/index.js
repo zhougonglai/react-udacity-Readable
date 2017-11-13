@@ -1,8 +1,9 @@
 import * as constant from '../util/constant';
-import {createAction, createActions} from 'redux-actions';
+import {createActions} from 'redux-actions';
 
-export const {getCategories} = createActions({
-  [constant.GET_CATEGORIES]: categories => ({categories})
+export const {getCategories, getCategoryPosts} = createActions({
+  [constant.GET_CATEGORIES]: categories => categories,
+  [constant.GET_CATEGORY_POSTS]: (categorie, posts) => ({categorie, posts})
 });
 
 

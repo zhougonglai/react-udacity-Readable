@@ -5,7 +5,7 @@ import {BrowserRouter} from 'react-router-dom';
 
 import './index.css';
 import 'material-components-web/dist/material-components-web.css';
-import App from './App';
+import {AppPage} from './containers';
 import registerServiceWorker from './registerServiceWorker';
 import store from './store';
 
@@ -13,7 +13,7 @@ import store from './store';
 ReactDOM.render(
 <BrowserRouter>
   <Provider store={store}>
-    <App/>
+    <AppPage/>
   </Provider>
 </BrowserRouter>, document.getElementById('root'));
 registerServiceWorker();
