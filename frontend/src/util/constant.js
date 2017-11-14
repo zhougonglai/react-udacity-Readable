@@ -1,14 +1,3 @@
-export const GET_CATEGORIES = 'GET_CATEGORIES';
-export const GET_CATEGORY_POSTS = 'GET_CATEGORY_POSTS';
-export const GET_POSTS = 'GET_POSTS';
-export const CREATE_POSTS = 'CREATE_POSTS';
-export const POSTS_DETAIL = 'POSTS_DETAIL';
-export const VOTING_POSTS = 'VOTING_POSTS';
-export const UPDATE_POSTS = 'UPDATE_POSTS';
-export const DELETE_POSTS = 'DELETE_POSTS';
-export const GET_COMMENTS = 'GET_COMMENTS';
-export const ADD_COMMENT = 'ADD_COMMENT';
-export const COMMENT_DETAIL = 'COMMENT_DETAIL';
-export const VOTING_COMMENT = 'votingComment';
-export const UPDATE_COMMENT = 'UPDATE_COMMENT';
-export const DELETE_COMMENT = 'DELETE_COMMENT';
+export const SET_CATEGORIES = 'SET_CATEGORIES';
+export const SET_POSTS = 'SET_POSTS';
+export const SET_COMMENTS = 'SET_COMMENTS';

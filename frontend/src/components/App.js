@@ -1,29 +1,42 @@
 import React, { Component } from 'react';
 import {Toolbar, Button, ToolbarTitle, ToolbarRow, ToolbarSection, IconToggle} from 'rmwc';
+import {Route} from 'react-router-dom';
 
-import {getCategories, getCategoryPosts} from '../util/api';
+import {getCategories, getPosts} from '../util/api';
+import Main from './directive/Main';
 import logo from '../logo.min.svg';
 import './app.css';
 
 class App extends Component {
 
-  componentDidMount(){
-    getCategories()
-    .then(categories => this.props.getCategories(categories))
-    .then(action => {
-      getCategoryPosts(action.payload[this.props.categories.active].path)
-      .then(data => {
-        console.log(data);
-      })
-    });
+  state ={
+    active: ''
+  }
 
+  componentDidMount(){
+    getPosts()
+    .then(posts => this.props.setPosts(posts));
+    getCategories()
+    .then(categories => this.props.setCategories(categories));
+  }
+
+  handleActive = (active) => {
+    if(active === this.state.active){
+      this.setState({active: ''});
+    }else{
+      this.setState({active});
+    }
   }
 
   render() {
-    const {categories} = this.props;
-    const {topics, posts, active} = categories;
+    const {categories, setComments} = this.props;
+    const {topics, posts, comments} = categories;
+    const {active} = this.state;
+    const activeTopics = posts.filter(post => post.category === active)
+
     return (
-      <div className="App">
+      <Route children={({match, location, history}) => {
+      return (<div id="app">
         <Toolbar theme="background">
           <ToolbarRow>
             <IconToggle 
@@ -34,11 +47,19 @@ class App extends Component {
               </div>
             </ToolbarTitle>
             <ToolbarSection alignEnd={true}>
-              {topics.map((topic, index) => <Button key={topic.name} dense stroked={active === index}>{topic.name}</Button>)}
+              {
+                topics.map((topic, index) => 
+                <Button key={topic.name} dense stroked={active === topic.path} onClick={() => this.handleActive(topic.path)}>
+                  {topic.name}
+                </Button>)
+              }
             </ToolbarSection>
           </ToolbarRow>
         </Toolbar>
-      </div>
+        <main className="main-container">
+          <Main posts={active ? activeTopics : posts} comments={comments} setComments={setComments}/>
+        </main>
+      </div>)}} />
     );
   }
 }

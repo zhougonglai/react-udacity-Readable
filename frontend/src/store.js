@@ -1,23 +1,20 @@
 import {createStore, applyMiddleware, compose} from 'redux';
 import thunk from 'redux-thunk';
-import logger from 'redux-logger';
+// import logger from 'redux-logger';
 
 import reducers from './reducers';
 
-const middlewares = [thunk];
+let middlewares = applyMiddleware(thunk);
 
 if(process.env.NODE_ENV !== 'production'){
-  middlewares.push(logger);
-  // 不知道如何 使用 多个 middleware
+  // middlewares = applyMiddleware(thunk, logger);
 }
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const store = createStore(
   reducers,
-  composeEnhancers(
-    applyMiddleware(thunk)
-  )
+  composeEnhancers(middlewares)
 )
 
 export default store;

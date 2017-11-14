@@ -20,7 +20,7 @@ export const getCategoryPosts = (category) =>
     .then(res => res.json())
 
 export const getPosts = () =>
-    fetch(`${api}/posts`)
+    fetch(`${api}/posts`, {headers})
     .then(res => res.json())
 
 export const createPosts = (posts) =>
@@ -31,7 +31,7 @@ export const createPosts = (posts) =>
     }).then(res => res.json())
 
 export const postsDetail = (id) =>
-    fetch(`${api}/posts/${id}`)
+    fetch(`${api}/posts/${id}`, {headers})
     .then(res => res.json())
 
 export const votingPosts = (id, option) =>
@@ -55,7 +55,7 @@ export const deletePosts = (id) =>
     }).then(res => res.json())
 
 export const getComments = (id) =>
-    fetch(`${api}/posts/${id}/comments`)
+    fetch(`${api}/posts/${id}/comments`, {headers})
     .then(res => res.json())
 
 export const addComment = (comment) =>
@@ -66,7 +66,7 @@ export const addComment = (comment) =>
     }).then(res => res.json())
   
 export const commentDetail = (id) =>
-    fetch(`${api}/comments/${id}`)
+    fetch(`${api}/comments/${id}`, {headers})
     .then(res => res.json())
 
 export const votingComment = (id, option) =>
