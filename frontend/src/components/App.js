@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {Toolbar, Button, ToolbarTitle, ToolbarRow, ToolbarSection, IconToggle} from 'rmwc';
 import {Route} from 'react-router-dom';
 
-import {getCategories, getPosts} from '../util/api';
+import {getCategories, getPosts, getComments} from '../util/api';
 import Main from './directive/Main';
 import logo from '../logo.min.svg';
 import './app.css';
@@ -10,12 +10,14 @@ import './app.css';
 class App extends Component {
 
   state ={
-    active: ''
+    active: '',
+    select: 0
   }
 
   componentDidMount(){
     getPosts()
-    .then(posts => this.props.setPosts(posts));
+    .then(posts => this.props.setPosts(posts))
+    .then(action => this.selectPost(0));
     getCategories()
     .then(categories => this.props.setCategories(categories));
   }
@@ -28,12 +30,18 @@ class App extends Component {
     }
   }
 
-  render() {
-    const {categories, setComments} = this.props;
-    const {topics, posts, comments} = categories;
-    const {active} = this.state;
-    const activeTopics = posts.filter(post => post.category === active)
+  selectPost = (select) => {
+    this.setState({select}, () => {
+      getComments(this.props.categories.posts[select].id)
+      .then(comments => this.props.setComments(comments));
+    })
+  }
 
+  render() {
+    const {categories} = this.props;
+    const {topics, posts, comments} = categories;
+    const {active, select} = this.state;
+    
     return (
       <Route children={({match, location, history}) => {
       return (<div id="app">
@@ -57,7 +65,9 @@ class App extends Component {
           </ToolbarRow>
         </Toolbar>
         <main className="main-container">
-          <Main posts={active ? activeTopics : posts} comments={comments} setComments={setComments}/>
+          <Main 
+          select={select} active={active} posts={posts} comments={comments}
+          selectPost={this.selectPost}/>
         </main>
       </div>)}} />
     );

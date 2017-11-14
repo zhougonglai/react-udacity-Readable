@@ -18,6 +18,7 @@ header.mdc-theme--background.mdc-toolbar {
 }
 
 main.main-container{
-  height: calc(100% - 50px);
+  height: calc(100% - 67px);
   padding: 50px 50px 0;
+  box-sizing: border-box;
 }

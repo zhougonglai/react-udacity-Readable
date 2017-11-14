@@ -9,16 +9,7 @@ import {
   Icon
 } from 'rmwc';
 
-import {getComments} from '../../util/api';
-
 class Comments extends Component {
-
-  componentDidMount(){
-    if(Object.keys(this.props.post) > 0){
-      getComments(this.props.post.id)
-      .then(comments => this.props.setComments(comments))
-    }
-  }
 
   render() {
     const {comments} = this.props;
