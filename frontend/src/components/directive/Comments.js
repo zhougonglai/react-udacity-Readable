@@ -6,7 +6,9 @@ import {
   ListItemStartDetail,
   ListItemText,
   ListItemEndDetail,
-  Icon
+  Icon,
+  Button,
+  Typography
 } from 'rmwc';
 
 class Comments extends Component {
@@ -14,7 +16,14 @@ class Comments extends Component {
   render() {
     const {comments} = this.props;
     return (
-      <Elevation z={1} className="comments__container">
+      <div className="comments__container">
+      <div className="tool-contrl">
+        <Typography use="headline" tag="h3" theme="primary">
+              评论
+        </Typography>
+        <Button raised>评论</Button>
+      </div>
+      <Elevation z={1}>
         <List dense avatarList>
           {
             (comments.length > 0)?
@@ -40,7 +49,8 @@ class Comments extends Component {
             </div>
           }
         </List>
-      </Elevation>
+        </Elevation>
+      </div>
     );
   }
 }

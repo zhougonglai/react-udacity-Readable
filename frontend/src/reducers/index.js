@@ -16,6 +16,8 @@ const categories = (state = initialCategories, action) => {
       return {...state, posts: payload};
     case constant.SET_COMMENTS:
       return {...state, comments: payload};
+    case constant.UPDATE_POST:
+      return {...state, posts: state.posts.filter(post => post.id !== payload.id).concat([payload])};
     default:
       return state;
   }
