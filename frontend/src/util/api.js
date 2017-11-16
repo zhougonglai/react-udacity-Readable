@@ -39,13 +39,13 @@ export const getPosts = () =>
  * body: string,
  * author: string enum {thingone, thingtwo}
  * category: enum {...categorys}
- * @param {obj} posts 
+ * @param {obj} post
  */
-export const createPosts = (posts) =>
+export const createPost = (post) =>
     fetch(`${api}/posts`,{
       method: 'POST',
       headers,
-      body: JSON.stringify({...posts,timestamp: Date.now()})
+      body: JSON.stringify({...post,timestamp: Date.now(),id: Math.random().toString(36).substr(-8)})
     }).then(res => res.json())
 
 /**

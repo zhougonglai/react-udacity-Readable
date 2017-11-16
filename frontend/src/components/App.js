@@ -44,6 +44,11 @@ class App extends Component {
     }
   }
 
+  /**
+   * @Behaviour : 选中指定post
+   * post 帖子
+   * @param {obj} post
+   */
   selectPost = (post) => {
     this.setState({select: post},()=>{
       getComments(post.id)
@@ -52,14 +57,15 @@ class App extends Component {
   }
 
   /**
+   * @Behaviour : 选中给定下标的帖子
    * posts 下标
    * @param {int} select 
    */
   selectPostByIndex = (select) => {
     this.setState((prevState,props) => ({
-      select: props.categories.posts[select] || []
+      select: props.categories.posts[select] || {}
     }),() => {
-      if(this.state.select.length > 0){
+      if(Object.keys(this.state.select).length > 0){
         getComments(this.state.select.id)
         .then(comments => this.props.setComments(comments));
       }else{
@@ -69,14 +75,15 @@ class App extends Component {
   }
 
   /**
+   * @Behaviour : 选中类型默认第一个帖子
    * category 类型
    * @param {enum} category 
    */
   selectPostByCategory = (category) => {
     this.setState((prevState, props)=>({
-        select: props.categories.posts.find(post => post.category === category) || []
+        select: props.categories.posts.find(post => post.category === category) || {}
     }),()=>{
-      if(this.state.select.length > 0){
+      if(Object.keys(this.state.select).length > 0){
         getComments(this.state.select.id)
         .then(comments => this.props.setComments(comments));
       } else {
@@ -92,8 +99,6 @@ class App extends Component {
           sortBy === 'voteScore' ? 'timestamp' : 'voteScore'
         ) : sortBy
       }
-    },() => {
-      this.selectPost(0);
     });
   }
 
@@ -108,7 +113,7 @@ class App extends Component {
   }
 
   render() {
-    const {categories, updatePost} = this.props;
+    const {categories, updatePost, setPosts} = this.props;
     const {topics, posts, comments} = categories;
     const {user, active, select, sortBy} = this.state;
     
@@ -147,7 +152,8 @@ class App extends Component {
         </Toolbar>
         <main className="main-container">
           <Main 
-          sortBy={sortBy} toggleSortBy={this.toggleSortBy} updatePost={updatePost}
+          sortBy={sortBy} toggleSortBy={this.toggleSortBy} 
+          updatePost={updatePost} setPosts={setPosts}
           select={select} active={active} posts={posts} 
           comments={comments} user={user}
           selectPost={this.selectPost}/>
