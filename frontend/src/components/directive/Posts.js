@@ -29,17 +29,17 @@ import {
   DialogFooterButton
 } from 'rmwc/Dialog';
 
-import {votingPost, createPost} from '../../util/api';
+import {Link, Route} from 'react-router-dom';
+
+import {votingPost, createPost, getComments} from '../../util/api';
 
 import Comments from './Comments';
 
-
-
-
 const categorys = ['react', 'redux', 'udacity'];
 
-class Main extends Component {
+class Posts extends Component {
   state={
+    sortBy: 'voteScore',
     dialog: false,
     menu:   false,
     snackbar: {
@@ -52,6 +52,31 @@ class Main extends Component {
       category: ''
     }
   }
+
+  componentDidMount(){
+    console.log('componentDidMount');
+    const {match, setComments} = this.props;
+    if(match.params.post_id){
+      getComments(match.params.post_id)
+      .then(comments => setComments(comments))
+    }
+  }
+
+  toggleSortBy = (sortBy) => {
+    this.setState(prevState => {
+      return {
+        sortBy: prevState.sortBy === sortBy ? (
+          sortBy === 'voteScore' ? 'timestamp' : 'voteScore'
+        ) : sortBy
+      }
+    });
+  }
+
+  /**
+   * @description 帖子投票
+   * @param {enum} {} 
+   * @param {obj} 帖子
+   */
   votePost = (post, vote) => {
     votingPost(post.id, vote)
     .then(post => this.props.updatePost(post))
@@ -104,47 +129,68 @@ class Main extends Component {
     }));
   }
 
+  /**
+   * 发帖流程
+   * @description 有category 类型 -> dialog
+   *              无category类型 -> menus 选择发帖类型
+   */
   createPost = () => {
-    if(this.props.active){
+    const {match} = this.props;
+    if(match && match.params.category){
       this.setState((prev, props)=> ({
         post: {
           ...prev.post,
-          category: props.active
+          category: match.params.category
         }
       }),()=>{
-        this.openDialog(this.props.active)
+        this.openDialog(match.params.category)
       })
     }else{
       this.setState({menu:true})
     }
   }
 
+  /**
+   * @description 实际创建Post的实现
+   */
   createNewPost = () => {
     const {title, body, category} = this.state.post;
     if(title.trim().length > 5 && body.trim().length > 9){
-      createPost({title, body, category, author:this.props.user})
-      .then(newPost => this.props.setPosts(this.props.posts.concat([newPost])))
-      .then(() => {
-        // 如果该类型下 原本没有帖子 则在创建后默认选中新创建帖子, 其他状况保持不变
-        if(this.activeTopics().length === 1){
-          this.props.selectPost(this.activeTopics()[0]);
+      createPost({title: title.trim(), body: body.trim() , category, author:this.props.user})
+      .then(newPost => {
+        const {setPosts,posts} = this.props; 
+        setPosts(posts.concat([newPost]))
+      })
+    }else{
+      //  不知道 为什么只有这里 会使得 场景 组件 snackbar 没有达到 目标效果 3秒后消失(组件默认行为)
+      this.setState({
+        snackbar:{
+          status: true,
+          msg: '标题字数需大于5 且 内容字数大于 9'
         }
       })
     }
   }
 
-  activeTopics(){
-    const {active, posts, sortBy} = this.props;
-    return (active === '' ? posts : posts.filter(post => post.category === active))
-           .sort((prev,next) => next[sortBy] - prev[sortBy]);
-  }
-
   render() {
-    const {comments, select, active, sortBy, user, toggleSortBy} = this.props;
-    const {dialog, snackbar, menu, post} = this.state;
-    // const filterTopics = active === "" ? posts : posts.filter(post => post.category === active);
-    // const activeTopics = filterTopics.sort((prev, next) => next[sortBy] - prev[sortBy]);
-    
+    const {
+      posts,
+      comments,
+      user,
+      match,
+      // ...others
+    } = this.props;
+    const {
+      dialog, 
+      snackbar, 
+      menu, 
+      post, 
+      sortBy
+    } = this.state;
+    const {status, msg} = snackbar;
+
+    const sortByCategory = posts.sort((prev, next) => next[sortBy] - prev[sortBy]);
+
     return (
       <div className="container">
         <div className="tool-contrl">
@@ -156,12 +202,12 @@ class Main extends Component {
           </Typography>
           <div className="btn-group">  
             <IconButton
-              onClick={() => toggleSortBy('voteScore')} 
+              onClick={() => this.toggleSortBy('voteScore')} 
               className={sortBy !== 'voteScore' && 'mdc-dark'}>
               {sortBy === 'voteScore' ? 'line_weight' : 'reorder'}
             </IconButton>
             <IconButton 
-              onClick={() => toggleSortBy('timestamp')}
+              onClick={() => this.toggleSortBy('timestamp')}
               className={sortBy !== 'timestamp' && 'mdc-dark'}>
               {sortBy === 'timestamp' ? 'restore' : 'schedule'}
             </IconButton>
@@ -181,48 +227,46 @@ class Main extends Component {
         </div>
         <Elevation z={1}>
           <ListGroup>
-          {active && <ListGroupSubheader>{active}</ListGroupSubheader>}
+          {match.params.category && <ListGroupSubheader>{match.params.category}</ListGroupSubheader>}
           <List twoLine avatarList>
               {
-                this.activeTopics().length > 0 ?
-                this.activeTopics().map((post, index) =>
+                sortByCategory.length > 0 ?
+                sortByCategory.map((post, index) =>
                 <ListItem key={post.id}
-                temporaryDrawerSelected={post.id === select.id}>
+                temporaryDrawerSelected={post.id === match.params.post_id}>
                   <ListItemStartDetail>
                     <Icon title={post.author}>account_circle</Icon>
                   </ListItemStartDetail>
                   <div className="item__score">
                     {post.voteScore}
                   </div>
-                  <ListItemText onClick={()=>this.props.selectPost(post)}>
-                    <Typography use="title">
-                      {post.title}
-                      <cite>
-                        作者: {post.author}
-                      </cite>
-                    </Typography>
-                    <ListItemTextSecondary>
-                      {post.body}
-                      <cite>
-                        创建时间 : {new Date(post.timestamp).toLocaleString()}
-                      </cite>
-                    </ListItemTextSecondary>
+                  <ListItemText wrap>
+                    <Link to={`/${post.category}/${post.id}`}>
+                      <Typography use="title">
+                        {post.title}
+                        <cite>
+                          作者: {post.author}
+                        </cite>
+                      </Typography>
+                      <ListItemTextSecondary>
+                        {post.body.substr(0, 24)}
+                        <cite>
+                          创建时间 : {new Date(post.timestamp).toLocaleString()}
+                        </cite>
+                      </ListItemTextSecondary>
+                    </Link>
                   </ListItemText>
+                  {user !== post.author && 
                   <ListItemEndDetail>
-                    {
-                      user === post.author ?(
-                        <div className="item-ctrls">
-                          <Icon title="编辑" aria-label="编辑">edit</Icon>
-                          <Icon title="删除" aria-label="删除">delete</Icon>
-                        </div>
-                      ):(
-                        <div className="item-ctrls">
-                          <Icon title="upVote" aria-label="加分" onClick={() => this.votePost(post, 'upVote')}>add</Icon>
-                          <Icon title="downVote" aria-label="扣分" onClick={() => this.votePost(post, 'downVote')}>remove</Icon>
-                        </div>
-                      )
-                    }
-                  </ListItemEndDetail>
+                      <div className="item-ctrls">
+                        <Icon title="upVote" aria-label="加分" onClick={() => this.votePost(post, 'upVote')}>
+                          thumb_up
+                        </Icon>
+                        <Icon title="downVote" aria-label="扣分" onClick={() => this.votePost(post, 'downVote')}>
+                          thumb_down
+                        </Icon>
+                      </div>
+                  </ListItemEndDetail>}
                 </ListItem>):
                 <ListItem>
                   <ListItemText>
@@ -234,12 +278,14 @@ class Main extends Component {
           </ListGroup>
         </Elevation>
 
-        <Comments comments={comments}/>
+        <Route path="/:category/:post_id" exact render={locations =>
+         <Comments comments={comments} {...locations}/>
+        }/>
 
         <Snackbar
-          show={snackbar.status}
-          onClose={evt => this.setState({snackbar:{status: false}})}
-          message={snackbar.msg}
+          show={status}
+          onClose={evt => this.setState({snackbar:{status: false,msg: ''}})}
+          message={msg}
           timeout={3000}
         />
 
@@ -274,4 +320,4 @@ class Main extends Component {
   }
 }
 
-export default Main;
+export default Posts;

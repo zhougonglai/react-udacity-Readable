@@ -9,6 +9,14 @@ a:-webkit-any-link {
   color: currentColor;
 }
 
+.full-height{
+  height: 100%;
+}
+
+.flex-grow{
+  flex: 1 1 auto;
+}
+
 .mdc-button:not(:disabled).mdc-dark{
   color: var(--mdc-theme-text-primary-on-background,rgba(0, 0, 0, 0.87));
 }
@@ -40,6 +48,11 @@ main.main-container{
 }
 
 /* Main */
+.mdc-list-group .mdc-list{
+  overflow-y: auto;
+  max-height: calc( 100vh - 300px);
+}
+
 .mdc-toolbar__section.mdc-toolbar__section--align-end .mdc-select{
   margin: 0 50px;
 }
@@ -53,7 +66,7 @@ main.main-container{
 }
 
 .mdc-list-item__end-detail.item-ctrls{
-  width: 60px;
+  width: 72px;
   display: flex;
   justify-content: space-between;
 }
@@ -114,20 +127,96 @@ main.main-container{
   display: inline-block;
   vertical-align: middle;
   width: 100%;
+  max-width: 200px;
   height: 1px;
   background: linear-gradient(to right,var(--mdc-theme-primary, rgba(116,95,181,0.8)),transparent 80%);
 }
 
-.comments__container{
-  margin-top: 50px;
-}
-
-.container .mdc-list-item__text{
+.container .mdc-list-item__text,
+.comments__container .mdc-list-item__text{
   cursor: pointer;
   flex:1;
+  max-width: calc(100% - 125px);
+  overflow: hidden;
 }
 
-.container .mdc-list-item__text cite{
+.container .mdc-list-item__text cite,
+.comments__container .mdc-list-item__text cite{
   float: right;
   margin-right: 15px;
+}
+
+cite .material-icons + .material-icons{
+  margin: 0 15px;
+}
+
+/* Post */
+
+.post__content{
+  height: calc(100% - 80px - 56px - 32px);
+}
+
+/* comments */
+.comments-list{
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+/* PreLoader */
+
+.back-shade{
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top:0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loader{
+  display: block;
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border:3px solid transparent;
+  border-top-color: #3498db;
+  z-index:10;
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
+}
+
+.loader:before{
+  content:"";
+  position: absolute;
+  top:5px;
+  left: 5px;
+  right:5px;
+  bottom:5px;
+  border:3px solid transparent;
+  border-top-color: #e74c3c;
+  border-radius: 50%;
+  animation: spin 3s linear infinite;
+}
+
+.loader:after{
+  content:"";
+  position: absolute;
+  top:15px;
+  left:15px;
+  right:15px;
+  bottom:15px;
+  border:3px solid transparent;
+  border-top-color:#f9c922;
+  border-radius: 50%;
+  animation: spin 4s linear infinite;
+}
+
+@keyframes spin{
+  0% {
+      transform: rotate(0deg);
+  } 100% {
+      transform: rotate(360deg);
+  }
 }

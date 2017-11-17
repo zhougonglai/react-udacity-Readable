@@ -3,108 +3,35 @@ import {
   Toolbar, 
   Button,
   Icon,
+  IconButton,
   ToolbarTitle, 
   ToolbarRow, 
-  ToolbarSection, 
-  IconToggle,
+  ToolbarSection,
   Select
 } from 'rmwc';
-import {Route} from 'react-router-dom';
+import {Route, Link} from 'react-router-dom';
 
-import {getCategories, getPosts, getComments} from '../util/api';
-import Main from './directive/Main';
+import {getCategories, getPosts} from '../util/api';
+import Posts from './directive/Posts';
+import Post from './directive/Post';
+import Prevloading from './directive/PreLoading';
 import logo from '../logo.min.svg';
 
 class App extends Component {
 
-  state ={
-    user: '',
-    active: '',
-    select: 0,
-    sortBy: 'voteScore'
-  }
+  state = { user: ''}
 
   componentDidMount(){
     getPosts()
-    .then(posts => this.props.setPosts(posts))
-    .then(action => this.selectPostByIndex(0));
+    .then(posts => this.props.setPosts(posts));
     getCategories()
     .then(categories => this.props.setCategories(categories));
-  }
-
-  handleActive = (active) => {
-    if(active === this.state.active){
-      this.setState({active: ''},() =>{
-        this.selectPostByIndex(0);
-      });
-    }else{
-      this.setState({active}, () => {
-        this.selectPostByCategory(active);
-      });
-    }
-  }
-
-  /**
-   * @Behaviour : 选中指定post
-   * post 帖子
-   * @param {obj} post
-   */
-  selectPost = (post) => {
-    this.setState({select: post},()=>{
-      getComments(post.id)
-      .then(comments => this.props.setComments(comments));
-    });
-  }
-
-  /**
-   * @Behaviour : 选中给定下标的帖子
-   * posts 下标
-   * @param {int} select 
-   */
-  selectPostByIndex = (select) => {
-    this.setState((prevState,props) => ({
-      select: props.categories.posts[select] || {}
-    }),() => {
-      if(Object.keys(this.state.select).length > 0){
-        getComments(this.state.select.id)
-        .then(comments => this.props.setComments(comments));
-      }else{
-        this.props.setComments([]);
-      }
-    })
-  }
-
-  /**
-   * @Behaviour : 选中类型默认第一个帖子
-   * category 类型
-   * @param {enum} category 
-   */
-  selectPostByCategory = (category) => {
-    this.setState((prevState, props)=>({
-        select: props.categories.posts.find(post => post.category === category) || {}
-    }),()=>{
-      if(Object.keys(this.state.select).length > 0){
-        getComments(this.state.select.id)
-        .then(comments => this.props.setComments(comments));
-      } else {
-        this.props.setComments([]);
-      }
-    })
-  }
-
-  toggleSortBy = (sortBy) => {
-    this.setState(prevState => {
-      return {
-        sortBy: prevState.sortBy === sortBy ? (
-          sortBy === 'voteScore' ? 'timestamp' : 'voteScore'
-        ) : sortBy
-      }
-    });
   }
 
   login = (user) => {
     this.setState({user});
   }
+
   logout = () => {
     const checkout = window.confirm("退出登录");
     if(checkout){
@@ -113,24 +40,39 @@ class App extends Component {
   }
 
   render() {
-    const {categories, updatePost, setPosts} = this.props;
-    const {topics, posts, comments} = categories;
-    const {user, active, select, sortBy} = this.state;
+    const {
+      categories, 
+      updatePost,
+      setComments,
+      match,
+      location,
+      setPosts
+    } = this.props;
+    const {
+      //  主题
+      topics, 
+      // 帖子
+      posts,
+      // 评论 
+      comments
+    } = categories;
+    const {user} = this.state;
     
-    return (
-      <Route children={({match, location, history}) => {
-      return (<div id="app">
+    return (<div id="app">
         <Toolbar theme="background">
           <ToolbarRow>
-            <IconToggle 
-              on={{label: 'close Menu', content: 'close'}} off={{label: 'Open Menu', content: 'menu'}}/>
+            <IconButton disabled={match.isExact}>
+              <Link to="/">
+                home
+              </Link>
+            </IconButton>
             <ToolbarTitle>
               <div className="logo">
                 <img alt="Udacity标志" src={logo} />
               </div>
             </ToolbarTitle>
 
-            <ToolbarSection alignEnd={true}>
+            <ToolbarSection alignEnd>
               {user !== '' && 
               <Button unelevated onClick={this.logout}>
                 <Icon className="mdc-button__icon">person</Icon>
@@ -142,24 +84,33 @@ class App extends Component {
                 value={user}
                 options={['thingone','thingtwo']}/>
               {
-                topics.map((topic, index) => 
-                <Button key={topic.name} dense stroked={active === topic.path} onClick={() => this.handleActive(topic.path)}>
-                  {topic.name}
+                topics.map((topic, index) =>
+                <Button dense wrap key={topic.name} stroked={location.pathname.includes(topic.path)}>
+                  <Link to={`/${topic.path}`}>
+                      {topic.name}
+                  </Link>
                 </Button>)
               }
             </ToolbarSection>
           </ToolbarRow>
         </Toolbar>
         <main className="main-container">
-          <Main 
-          sortBy={sortBy} toggleSortBy={this.toggleSortBy} 
-          updatePost={updatePost} setPosts={setPosts}
-          select={select} active={active} posts={posts} 
-          comments={comments} user={user}
-          selectPost={this.selectPost}/>
+          <Route path="/" exact render={locations => 
+                <Posts {...locations} posts={posts.filter(post => !post.deleted)} user={user}
+                updatePost={updatePost} setPosts={setPosts}/>}/>
+
+          <Route path="/:category" exact render={locations =>
+                <Posts {...locations} posts={posts.filter(post => !post.deleted).filter(post => post.category === locations.match.params.category)} user={user}
+                updatePost={updatePost} setPosts={setPosts}/>}/>
+
+          <Route path="/:category/:post_id" exact render={locations =>{
+            const post = posts.find(post => post.id === locations.match.params.post_id);
+          return post ? <Post {...locations} user={user} post={post} updatePost={updatePost}
+              comments={comments.filter(comment => !comment.deleted)} setComments={setComments}/> : <Prevloading/>
+          }}/>
         </main>
-      </div>)}} />
-    );
+      
+  </div>);
   }
 }
 

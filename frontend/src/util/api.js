@@ -12,6 +12,7 @@ const headers = {
 }
 /**
  * 获取所有类型
+ * @returns posts
  */
 export const getCategories = () => 
     fetch(`${api}/categories`, {headers})
@@ -20,13 +21,15 @@ export const getCategories = () =>
 
 /**
  * 获取类型 下的所有帖子
- * @param {string} category 
+ * @param {string} category
+ * @return posts
  */
 export const getCategoryPosts = (category) =>
     fetch(`${api}/${category}/posts`, {headers})
     .then(res => res.json())
 /**
  * 获取所有的帖子
+ * @returns posts
  */
 export const getPosts = () =>
     fetch(`${api}/posts`, {headers})
@@ -40,6 +43,7 @@ export const getPosts = () =>
  * author: string enum {thingone, thingtwo}
  * category: enum {...categorys}
  * @param {obj} post
+ * @returns post
  */
 export const createPost = (post) =>
     fetch(`${api}/posts`,{
@@ -50,7 +54,8 @@ export const createPost = (post) =>
 
 /**
  * 帖子详情
- * @param {uuid} id 
+ * @param {uuid} id
+ * @returns post
  */
 export const postsDetail = (id) =>
     fetch(`${api}/posts/${id}`, {headers})
@@ -61,6 +66,7 @@ export const postsDetail = (id) =>
  * option: {upVote, downVote}
  * @param {uuid} id 
  * @param {enum} option 
+ * @returns newPost
  */
 export const votingPost = (id, option) =>
     fetch(`${api}/posts/${id}`,{
@@ -77,7 +83,7 @@ export const votingPost = (id, option) =>
  * @param {uuid} id 
  * @param {obj} body 
  */
-export const updatePosts = (id, body) =>
+export const updatePost = (id, body) =>
     fetch(`${api}/posts/${id}`,{
       method: 'PUT',
       headers,
@@ -106,9 +112,9 @@ export const getComments = (id) =>
  * comment:{
  * id: uuid
  * timestamp: Date.now(),
- * body: string,
- * author: string,
- * parentId: post.id
+ * - body: string,
+ * - author: string,
+ * - parentId: post.id
  * }
  * @param {obj} comment 
  */
@@ -116,7 +122,7 @@ export const addComment = (comment) =>
     fetch(`${api}/comments`,{
       method: 'POST',
       headers,
-      body: JSON.stringify({...comment,timestamp: Date.now()})
+      body: JSON.stringify({...comment,timestamp: Date.now(), id: Math.random().toString(36).substr(-8)})
     }).then(res => res.json())
   
 /**
@@ -134,7 +140,7 @@ export const commentDetail = (id) =>
  * @param {string} option 
  */
 export const votingComment = (id, option) =>
-    fetch(`${api}/commments/${id}`,{
+    fetch(`${api}/comments/${id}`,{
       method: 'POST',
       headers,
       body: JSON.stringify({option})
@@ -149,7 +155,7 @@ export const updateComment = (id, body) =>
     fetch(`${api}/comments/${id}`,{
       method: 'PUT',
       headers,
-      body: JSON.stringify({body, timestamp: Date.now()})
+      body: JSON.stringify({...body, timestamp: Date.now()})
     }).then(res => res.json())
 
     /**

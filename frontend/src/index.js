@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
-import {BrowserRouter} from 'react-router-dom';
+import {BrowserRouter, Route} from 'react-router-dom';
 
 import './index.css';
 import 'material-components-web/dist/material-components-web.css';
@@ -13,7 +13,8 @@ import store from './store';
 ReactDOM.render(
 <BrowserRouter>
   <Provider store={store}>
-    <AppPage/>
+    {/* path="/:category/:post_id"  */}
+    <Route children={location => <AppPage {...location}/>}/>
   </Provider>
 </BrowserRouter>, document.getElementById('root'));
 registerServiceWorker();
