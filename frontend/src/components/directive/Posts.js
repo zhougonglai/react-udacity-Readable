@@ -15,8 +15,6 @@ import {
   Typography,
   Snackbar,
   Dialog,
-  FormField,
-  Textfield,
 } from 'rmwc';
 import { MenuAnchor, MenuItem, Menu } from 'rmwc/Menu';
 import { 
@@ -28,7 +26,7 @@ import {
   DialogFooter, 
   DialogFooterButton
 } from 'rmwc/Dialog';
-
+import TextField from 'material-ui/TextField';
 import {Link, Route} from 'react-router-dom';
 
 import {votingPost, createPost, getComments} from '../../util/api';
@@ -302,12 +300,10 @@ class Posts extends Component {
                 </DialogHeaderTitle>
               </DialogHeader>
               <DialogBody>
-                <FormField className="form__post">
-                  <Textfield className="post__title" label="title 标题" value={post.title} 
-                  onChange={(event) => this.handleChange('title',event.target.value)} />
-                  <Textfield className="post__body" label="body 内容" value={post.body}
-                    onChange={(event) => this.handleChange('body',event.target.value)}/>
-                </FormField>
+                <TextField className="post__title" fullWidth label="title 标题" value={post.title} 
+                onChange={(event) => this.handleChange('title',event.target.value)} />
+                <TextField className="post__body" fullWidth label="body 内容" value={post.body}
+                  onChange={(event) => this.handleChange('body',event.target.value)}/>
               </DialogBody>
               <DialogFooter>
                 <DialogFooterButton cancel>取消</DialogFooterButton>

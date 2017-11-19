@@ -14,7 +14,7 @@ src
 ├── actions
 │   └── index.js              所有的动作
 ├── components                组件
-│   ├── App.js                Root    @problem(疑问)- 1
+│   ├── App.js                Root
 │   ├── directive             小组件(取名糟糕😰)
 │   │   ├── Comments.js       评论列表
 │   │   ├── Post.js           帖子详情
@@ -35,13 +35,6 @@ src
     ├── api.js                服务端口
     └── constant.js           动作名
 ```
-
-> @problem 疑问 - 1
-
-有点想简化 App 中 router.params 的重复性
-
-[/, /:category, /:category/:post_id]
-用一个 Route(children) 处理 避免 过多的重复分支
 
 > 使用 package:
 
