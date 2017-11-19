@@ -49,7 +49,7 @@ src
 > 后续考虑增加...
  - props-type
  - jsdoc
-
+---
  > 项目逻辑
 
  App -
@@ -62,6 +62,7 @@ category 选中
  - /:category => posts.filter(!delete).filter(category) [Posts]
  - /:category/:post_id => posts.fiter(post.id === postId) [Post][Comments]
 
+---
 Posts - 
 
 index.css#68行 投票样式细节
@@ -75,6 +76,8 @@ index.css#68行 投票样式细节
  - vote()
  - toDetail
 
+---
+
 Post - 
 
  - getComments(postId)
@@ -84,7 +87,11 @@ Post -
  - edit()
  - reset()
 
+---
+
 Comments - 
+
+![评论细节](comments.png)
 
  - delete()
  - edit()
