@@ -5,12 +5,14 @@ export const {
   setCategories,
   setPosts, 
   setComments,
-  updatePost
+  updatePost,
+  updateComment,
 } = createActions({
   [constant.SET_CATEGORIES]: categories => categories,
   [constant.SET_POSTS]: posts => posts,
   [constant.SET_COMMENTS]: comments => comments,
   [constant.UPDATE_POST]: post => post,
+  [constant.UPDATE_COMMENT]: comment => comment
 });
 
 

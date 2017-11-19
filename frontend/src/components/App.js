@@ -9,12 +9,11 @@ import {
   ToolbarSection,
   Select
 } from 'rmwc';
-import {Route, Link} from 'react-router-dom';
+import {Route, Link, Switch} from 'react-router-dom';
 
 import {getCategories, getPosts} from '../util/api';
 import Posts from './directive/Posts';
 import Post from './directive/Post';
-import Prevloading from './directive/PreLoading';
 import logo from '../logo.min.svg';
 
 class App extends Component {
@@ -46,7 +45,8 @@ class App extends Component {
       setComments,
       match,
       location,
-      setPosts
+      setPosts,
+      updateComment
     } = this.props;
     const {
       //  主题
@@ -95,19 +95,31 @@ class App extends Component {
           </ToolbarRow>
         </Toolbar>
         <main className="main-container">
-          <Route path="/" exact render={locations => 
-                <Posts {...locations} posts={posts.filter(post => !post.deleted)} user={user}
-                updatePost={updatePost} setPosts={setPosts}/>}/>
+          <Switch>
+            <Route path="/" exact render={locations => 
+                  <Posts {...locations} posts={posts.filter(post => !post.deleted)} user={user}
+                  updatePost={updatePost} setPosts={setPosts}/>}/>
 
-          <Route path="/:category" exact render={locations =>
-                <Posts {...locations} posts={posts.filter(post => !post.deleted).filter(post => post.category === locations.match.params.category)} user={user}
-                updatePost={updatePost} setPosts={setPosts}/>}/>
+            <Route path="/:category" exact render={locations =>
+                  <Posts {...locations} posts={posts.filter(post => !post.deleted).filter(post => post.category === locations.match.params.category)} user={user}
+                  updatePost={updatePost} setPosts={setPosts}/>}/>
 
-          <Route path="/:category/:post_id" exact render={locations =>{
-            const post = posts.find(post => post.id === locations.match.params.post_id);
-          return post ? <Post {...locations} user={user} post={post} updatePost={updatePost}
-              comments={comments.filter(comment => !comment.deleted)} setComments={setComments}/> : <Prevloading/>
-          }}/>
+            <Route path="/:category/:post_id" exact render={locations =>{
+              const post = posts.find(post => post.id === locations.match.params.post_id);
+            return post ? <Post {...locations} 
+                user={user} post={post} updatePost={updatePost} updateComment={updateComment}
+                comments={comments.filter(comment => !comment.deleted)} setComments={setComments}/> : 
+                <div>
+                  <h3>404 nomatch</h3>
+                  <Link to="/">go home </Link>
+                </div>
+            }}/>
+            <Route path="*" render={_ => 
+            <div>
+              <h3>404 nomatch</h3>
+              <Link to="/">go home </Link>
+            </div>}/>
+          </Switch>
         </main>
       
   </div>);

@@ -67,6 +67,7 @@ main.main-container{
 
 .mdc-list-item__end-detail.item-ctrls{
   width: 72px;
+  min-width: 72px;
   display: flex;
   justify-content: space-between;
 }

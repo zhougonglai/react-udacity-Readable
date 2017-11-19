@@ -64,12 +64,18 @@ category 选中
 
 Posts - 
 
+index.css#68行 投票样式细节
+
+.mdc-list-item__end-detail.item-ctrls
+
+![投票细节](screenshort.png)
+
  - posts.map()
  - sortBy()
  - vote()
  - toDetail
 
- Post - 
+Post - 
 
  - getComments(postId)
  - [Comments]
@@ -78,7 +84,7 @@ Posts -
  - edit()
  - reset()
 
- Comments - 
+Comments - 
 
  - delete()
  - edit()
@@ -87,5 +93,4 @@ Posts -
 
  action, reducer -
 
- 多了一个 update动作后来发现没有太大的必要...
  [setPosts,setCategorys, setComments]

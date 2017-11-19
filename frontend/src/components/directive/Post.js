@@ -99,7 +99,7 @@ class Post extends Component {
   }
 
   render() {
-    const {post, user, comments, match, setComments} = this.props;
+    const {post, user, comments, match, setComments, updateComment} = this.props;
     const {editor} = this.state;
     
     return (
@@ -144,7 +144,8 @@ class Post extends Component {
           </Card>
         </GridCell>
         <GridCell span={6}>
-          <Comments comments={comments} user={user} match={match} setComments={setComments}/>
+          <Comments comments={comments} user={user} match={match} 
+                    setComments={setComments} updateComment={updateComment}/>
         </GridCell>
       </Grid>
       <Dialog open={editor.status}>

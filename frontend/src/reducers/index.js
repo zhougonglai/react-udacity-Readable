@@ -17,8 +17,9 @@ const categories = (state = initialCategories, action) => {
     case constant.SET_COMMENTS:
       return {...state, comments: payload};
     case constant.UPDATE_POST:
-    // shulde remove
       return {...state, posts: state.posts.filter(post => post.id !== payload.id).concat([payload])};
+    case constant.UPDATE_COMMENT:
+      return {...state, comments: state.comments.filter(comment => comment.id !== payload.id).concat([payload])};
     default:
       return state;
   }

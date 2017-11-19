@@ -27,9 +27,17 @@ import {
   DialogFooterButton
 } from 'rmwc/Dialog';
 import TextField from 'material-ui/TextField';
+import Delete from 'material-ui-icons/Delete';
+import Edite from 'material-ui-icons/Edit';
 import {Link, Route} from 'react-router-dom';
 
-import {votingPost, createPost, getComments} from '../../util/api';
+import {
+  votingPost, 
+  createPost, 
+  getComments, 
+  updatePost,
+  deletePosts
+} from '../../util/api';
 
 import Comments from './Comments';
 
@@ -45,6 +53,7 @@ class Posts extends Component {
       msg: ''
     },
     post: {
+      type: '',
       title: '',
       body: '',
       category: ''
@@ -88,15 +97,29 @@ class Posts extends Component {
     })
   }
 
-  openDialog = (category) => {
+  openDialog = (category, post) => {
     if(this.props.user){
-      this.setState(prev => ({
-        dialog: true,
-        post:{
-          ...prev.post,
-          category
-        }
-      }));
+      if(post){
+        this.setState(prev => ({
+          dialog: true,
+          post: {
+            title: post.title,
+            body: post.body,
+            category,
+            type: 'edit',
+            id: post.id
+          }
+        }));
+      } else {
+        this.setState(prev => ({
+          dialog: true,
+          post:{
+            ...prev.post,
+            category,
+            type: 'create'
+          }
+        }));
+      }
     }else{
       this.setState({
         snackbar:{
@@ -123,6 +146,7 @@ class Posts extends Component {
       ...prev.post,
       title: '',
       body: '',
+      type: ''
      }
     }));
   }
@@ -148,17 +172,39 @@ class Posts extends Component {
     }
   }
 
+  editPost = (post) => {
+    this.openDialog(post.category,{...post});
+  }
+
+  deletePost = post => {
+    deletePosts(post.id)
+    .then(newPost => this.props.updatePost(newPost));
+  }
   /**
    * @description 实际创建Post的实现
    */
-  createNewPost = () => {
-    const {title, body, category} = this.state.post;
+  createNewOrEditPost = () => {
+    const {title, body, category, type, id} = this.state.post;
     if(title.trim().length > 5 && body.trim().length > 9){
-      createPost({title: title.trim(), body: body.trim() , category, author:this.props.user})
-      .then(newPost => {
-        const {setPosts,posts} = this.props; 
-        setPosts(posts.concat([newPost]))
-      })
+      switch(type){
+        case 'create':
+          createPost({title: title.trim(), body: body.trim() , category, author:this.props.user})
+          .then(newPost => {
+            const {setPosts,posts} = this.props; 
+            setPosts(posts.concat([newPost]))
+          });
+          break;
+        case 'edit':
+          updatePost(id,{title: title.trim() ,body: body.trim()})
+          .then(newPost => this.props.updatePost(newPost));
+          break;
+        default:
+          createPost({title: title.trim(), body: body.trim() , category, author:this.props.user})
+          .then(newPost => {
+            const {setPosts,posts} = this.props; 
+            setPosts(posts.concat([newPost]))
+          });
+      }
     }else{
       //  不知道 为什么只有这里 会使得 场景 组件 snackbar 没有达到 目标效果 3秒后消失(组件默认行为)
       this.setState({
@@ -254,8 +300,17 @@ class Posts extends Component {
                       </ListItemTextSecondary>
                     </Link>
                   </ListItemText>
-                  {user !== post.author && 
                   <ListItemEndDetail>
+                    {
+                      user === post.author ?
+                      <div className="item-ctrls">
+                        <Icon title="编辑" onClick={evn => this.editPost(post)}>
+                          <Edite />
+                        </Icon>
+                        <Icon title="删除" onClick={evn => this.deletePost(post)}>
+                          <Delete />
+                        </Icon>
+                      </div>:
                       <div className="item-ctrls">
                         <Icon title="upVote" aria-label="加分" onClick={() => this.votePost(post, 'upVote')}>
                           thumb_up
@@ -264,7 +319,8 @@ class Posts extends Component {
                           thumb_down
                         </Icon>
                       </div>
-                  </ListItemEndDetail>}
+                    }
+                  </ListItemEndDetail>
                 </ListItem>):
                 <ListItem>
                   <ListItemText>
@@ -288,13 +344,13 @@ class Posts extends Component {
         />
 
         <Dialog open={dialog} 
-          onAccept={this.createNewPost}
+          onAccept={this.createNewOrEditPost}
           onClose={this.closeDialog}>
           <DialogRoot>
             <DialogSurface>
               <DialogHeader>
                 <DialogHeaderTitle>
-                  发帖 : 
+                  {post.type === 'edit' ? '编辑' : '发帖'}: 
                   <Icon className="mdc-button__icon">extension</Icon> - {post.category} |
                   <Icon className="mdc-button__icon">person</Icon> - {user}
                 </DialogHeaderTitle>
